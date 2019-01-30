@@ -1,7 +1,11 @@
-Vue.component('product', {
+var product = {
     props: {
         premium: {
             type: Boolean,
+            required: true,
+        },
+        details: {
+            type: Array,
             required: true,
         },
     },
@@ -19,9 +23,8 @@ Vue.component('product', {
         '            <p v-else class="tip red">Out of stock</p>\n' +
         '            <p>Shipping: {{ shipping }}</p>' +
         '\n' +
-        '            <ul class="product-details">\n' +
-        '                <li v-for="detail in product.details">{{ detail }}</li>\n' +
-        '            </ul>\n' +
+        '            <product-details :details="details"></product-details>' +
+        '<br>\n' +
         '\n' +
         '            <div @mouseover="updateProduct(variantIndex)"\n' +
         '                 v-for="(variant, variantIndex) in product.variants"\n' +
@@ -49,7 +52,6 @@ Vue.component('product', {
                 name: "Some product",
                 image: "images/product-default.png",
                 onSale: false,
-                details: ["Feature one", "Awesome ability", "Legendary reliability"],
                 variants: [
                     {
                         id: 63455,
@@ -97,11 +99,29 @@ Vue.component('product', {
             return 300.00;
         },
     },
+};
+
+Vue.component('product-details', {
+    props: {
+        details: {
+            type: Array,
+            required: true,
+        },
+    },
+    template: '<div class="product-details">' +
+        '            <ul>\n' +
+        '                <li v-for="detail in details">{{ detail }}</li>\n' +
+        '            </ul>\n' +
+        '</div>',
 });
 
 var app = new Vue({
     el: "#app",
     data: {
         premium: true,
+        details: ["Feature one", "Awesome ability", "Legendary reliability"],
+    },
+    components: {
+        'product': product,
     },
 });
