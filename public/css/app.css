@@ -1,0 +1,44 @@
+.product div {
+    display: inline-block;
+}
+
+.product-image {
+    border: 1px solid lightgray;
+    padding: 5px;
+}
+
+.product-info {
+    margin: 0 10px 10px 10px;
+    vertical-align: top;
+}
+
+.tip {
+    width: fit-content;
+    width: -moz-fit-content;
+    font-size: large;
+    font-weight: bold;
+}
+
+.green {
+    color: #558555;
+}
+
+.yellow {
+    color: #9c9c00;
+}
+
+.red {
+    color: #a14f4f;
+}
+
+.bright-red {
+    color: #a3080f;
+}
+
+.inline {
+    display: inline-block;
+    margin: 5px;
+    border: 1px solid lightgray;
+    width: 5em;
+    text-align: center;
+}
