@@ -1,4 +1,6 @@
-var product = {
+var eventBus = new Vue();
+
+Vue.component('product', {
     props: {
         premium: {
             type: Boolean,
@@ -20,18 +22,8 @@ var product = {
         '          </div>\n' +
         '          <div class="col-md-12 margin-top">' +
         '          <div>' +
-        '            <h2>Reviews</h2>' +
-        '            <p v-if="!reviews.length">There are no reviews yet.</p>' +
-        '            <ul>' +
-        '              <li v-for="review in reviews">' +
-        '                <p>{{ review.name }}</p>' +
-        '                <p>Rating: {{ review.rating }}</p>' +
-        '                <p>{{ review.review }}</p>' +
-        '                <p v-if="review.recommend">Recommend this: <b>{{ review.recommend }}</b></p>' +
-        '              </li>' +
-        '            </ul>' +
+        '            <product-tabs :reviews="reviews"></product-tabs>' +
         '          </div>' +
-        '           <product-review @review-submitted="addReview"></product-review>' +
         '          </div>' +
         '        </div>' +
         '        <div class="product-info">\n' +
@@ -109,9 +101,6 @@ var product = {
         deleteCurrent: function (currentRemove) {
             this.$emit('delete-current', currentRemove);
         },
-        addReview(productReview) {
-            this.reviews.push(productReview);
-        },
     },
     computed: {
         title() {
@@ -130,7 +119,12 @@ var product = {
             return 300.00;
         },
     },
-};
+    mounted() {
+        eventBus.$on('review-submitted', productReview => {
+            this.reviews.push(productReview);
+        })
+    },
+});
 
 Vue.component('product-details', {
     props: {
@@ -229,7 +223,7 @@ Vue.component('product-review', {
                     rating: this.rating,
                     recommend: this.recommend,
                 };
-                this.$emit('review-submitted', productReview);
+                eventBus.$emit('review-submitted', productReview);
                 this.name = null;
                 this.review = null;
                 this.rating = null;
@@ -244,15 +238,48 @@ Vue.component('product-review', {
     },
 });
 
+Vue.component('product-tabs', {
+    props: {
+        reviews: {
+            type: Array,
+            required: false,
+        },
+    },
+    template: `
+        <div>
+          <span class="tab"
+                :class="{ activeTab: selectedTab === tab }"
+                v-for="(tab, index) in tabs"
+                :key="index"
+                @click="selectedTab = tab">{{ tab }}</span>
+          <div v-show="selectedTab === 'Reviews'"> 
+            <p v-if="!reviews.length">There are no reviews yet.</p> 
+            <ol> 
+              <li class="product-image" v-for="review in reviews"> 
+                <p>{{ review.name }}</p> 
+                <p>Rating: {{ review.rating }}</p> 
+                <p>{{ review.review }}</p> 
+                <p v-if="review.recommend">Recommend this: <b>{{ review.recommend }}</b></p> 
+              </li> 
+            </ol> 
+          </div>
+          <product-review v-show="selectedTab === 'Make a Review'"></product-review>
+        </div>
+      `,
+    data() {
+        return {
+            tabs: ['Reviews', 'Make a Review'],
+            selectedTab: 'Reviews',
+        }
+    }
+});
+
 var app = new Vue({
     el: "#app",
     data: {
         premium: true,
         details: ["Feature one", "Awesome ability", "Legendary reliability"],
         cart: [],
-    },
-    components: {
-        'product': product,
     },
     methods: {
         addToCart: function (id) {

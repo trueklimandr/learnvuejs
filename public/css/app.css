@@ -65,3 +65,14 @@
 .margin-top {
     margin-top: 10px;
 }
+
+.tab {
+    margin: 5px;
+    cursor: pointer;
+}
+
+.activeTab {
+    font-weight: bold;
+    color: #0c5460;
+    text-decoration: underline;
+}
