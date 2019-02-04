@@ -5,6 +5,8 @@
 .product-image {
     border: 1px solid lightgray;
     padding: 5px;
+    width: inherit;
+    min-width: 200px;
 }
 
 .product-info {
@@ -58,4 +60,8 @@
 
 .remove-from-cart {
     margin: 5px;
+}
+
+.margin-top {
+    margin-top: 10px;
 }
