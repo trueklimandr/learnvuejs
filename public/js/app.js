@@ -8,6 +8,10 @@ var product = {
             type: Array,
             required: true,
         },
+        cart: {
+            type: Array,
+            required: true,
+        },
     },
     template: '<div class="product">\n' +
         '        <div class="product-image">\n' +
@@ -37,11 +41,9 @@ var product = {
         '\n' +
         '            <button @click="addToCart" class="btn btn-primary"  :disabled="!productCount>0">Add to Cart</button>\n' +
         '\n' +
-        '            <div class="cart">\n' +
-        '                <p>Cart({{ cart }})</p>\n' +
-        '            </div>\n' +
-        '\n' +
         '            <button @click="emptyCart()" class="btn btn-dark">Empty Cart</button>\n' +
+        '            <br>' +
+        '            <remove-from-cart :cart="cart" @delete-current="deleteCurrent"></remove-from-cart>' +
         '        </div>\n' +
         '    </div>',
     data() {
@@ -65,22 +67,30 @@ var product = {
                         image: "images/product-red.png",
                         count: 0,
                     },
+                    {
+                        id: 63457,
+                        color: "yellow",
+                        image: "images/product-yellow.png",
+                        count: 2,
+                    },
                 ],
             },
-            cart: 0,
         };
     },
     methods: {
         addToCart: function () {
-            this.cart++;
+            this.$emit('add-to-cart', this.product.variants[this.product.selectedVariant].id);
         },
         updateProduct: function (variantIndex) {
             this.product.selectedVariant = variantIndex;
             this.product.image = this.product.variants[variantIndex].image;
         },
         emptyCart: function () {
-            this.cart = 0;
-        }
+            this.$emit('empty-cart');
+        },
+        deleteCurrent: function (currentRemove) {
+            this.$emit('delete-current', currentRemove);
+        },
     },
     computed: {
         title() {
@@ -115,13 +125,54 @@ Vue.component('product-details', {
         '</div>',
 });
 
+Vue.component('remove-from-cart', {
+    props: {
+        cart: {
+            type: Array,
+            required: true,
+        },
+    },
+    template: '<div class="remove-from-cart" v-show="cart.length">' +
+        '            <select class="custom-select-sm" name="cartProductId">' +
+        '               <option v-for="cartProductId in cart" ' +
+        '                       :value="cartProductId">{{ cartProductId }}</option>' +
+        '            </select>\n' +
+        '            <button type="button" @click="deleteCurrent">Remove current</button>' +
+        '</div>',
+    methods: {
+        setCurrentRemove: function (event) {
+            this.currentRemove = event.srcElement.value;
+        },
+        deleteCurrent: function (event) {
+            this.$emit('delete-current', $(event.srcElement).prev().val());
+        },
+    },
+    data() {
+        return {
+            currentRemove: 0,
+        };
+    },
+});
+
 var app = new Vue({
     el: "#app",
     data: {
         premium: true,
         details: ["Feature one", "Awesome ability", "Legendary reliability"],
+        cart: [],
     },
     components: {
         'product': product,
+    },
+    methods: {
+        addToCart: function (id) {
+            this.cart.push(id);
+        },
+        emptyCart: function () {
+            this.cart = [];
+        },
+        deleteCurrent: function (currentRemove) {
+            this.cart = this.cart.filter(item => item != currentRemove);
+        },
     },
 });
